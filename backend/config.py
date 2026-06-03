@@ -1,69 +1,80 @@
 """
 ============================================
-AI 行业脉搏 - 数据库配置
+AI 行业脉搏 - 配置文件
 ============================================
 
-【重要】此文件包含数据库连接信息，请确保：
-1. 生产环境使用环境变量
-2. config.py 在 .gitignore 中
-3. 不要提交真实的数据库密码
-
-使用方法：
-1. 复制 config.example.py 为 config.py
-2. 填入您的数据库连接信息
-3. 运行 python main.py 自动创建表结构
+本地开发版本配置
 """
 
 import os
-from typing import Optional
+
+# ============================================
+# 数据库配置
+# ============================================
+# True = 使用 SQLite（本地开发，无需安装数据库）
+# False = 使用 PostgreSQL（生产环境）
+USE_SQLITE = True
+
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "ai_pulse")
+
+@property
+def database_url(self) -> str:
+    return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+
+# ============================================
+# AI API 配置
+# ============================================
+AI_API_KEY = os.getenv("AI_API_KEY", "")
+AI_API_BASE_URL = os.getenv("AI_API_BASE_URL", "https://api.deepseek.com")
+AI_MODEL = os.getenv("AI_MODEL", "deepseek-chat")
+
+# ============================================
+# 邮件服务配置（可选）
+# ============================================
+SMTP_HOST = os.getenv("SMTP_HOST", "")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+SMTP_FROM = os.getenv("SMTP_FROM", "")
+
+# ============================================
+# JWT 配置
+# ============================================
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev-secret-key-change-in-production")
+JWT_ALGORITHM = "HS256"
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 小时
+
+# ============================================
+# 验证码配置
+# ============================================
+VERIFICATION_CODE_EXPIRE_MINUTES = 5
+VERIFICATION_CODE_LENGTH = 6
 
 
 class Config:
-    """数据库配置类"""
-
-    # PostgreSQL 连接配置
-    POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "localhost")
-    POSTGRES_PORT: int = int(os.getenv("POSTGRES_PORT", "5432"))
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "ai_pulse")
-
-    # ============================================
-    # AI API 配置（用于内容处理 Pipeline）
-    # ============================================
-    AI_API_KEY: str = os.getenv("AI_API_KEY", "")
-    AI_API_BASE_URL: str = os.getenv("AI_API_BASE_URL", "https://api.deepseek.com")
-    AI_MODEL: str = os.getenv("AI_MODEL", "deepseek-chat")
-
-    # ============================================
-    # 邮件服务配置（用于发送验证码）
-    # ============================================
-    SMTP_HOST: str = os.getenv("SMTP_HOST", "smtp.qq.com")
-    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
-    SMTP_USER: str = os.getenv("SMTP_USER", "")
-    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
-    SMTP_FROM: str = os.getenv("SMTP_FROM", "")
-
-    # 验证码配置
-    VERIFICATION_CODE_EXPIRE_MINUTES: int = 5
-    VERIFICATION_CODE_LENGTH: int = 6
-
-    # ============================================
-    # JWT 配置
-    # ============================================
-    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
-    JWT_ALGORITHM: str = "HS256"
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 小时
+    """配置类"""
+    USE_SQLITE = USE_SQLITE
+    AI_API_KEY = AI_API_KEY
+    AI_API_BASE_URL = AI_API_BASE_URL
+    AI_MODEL = AI_MODEL
+    SMTP_HOST = SMTP_HOST
+    SMTP_PORT = SMTP_PORT
+    SMTP_USER = SMTP_USER
+    SMTP_PASSWORD = SMTP_PASSWORD
+    SMTP_FROM = SMTP_FROM or SMTP_USER
+    JWT_SECRET_KEY = JWT_SECRET_KEY
+    JWT_ALGORITHM = JWT_ALGORITHM
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES = JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+    VERIFICATION_CODE_EXPIRE_MINUTES = VERIFICATION_CODE_EXPIRE_MINUTES
+    VERIFICATION_CODE_LENGTH = VERIFICATION_CODE_LENGTH
 
     @property
     def database_url(self) -> str:
-        """获取数据库连接 URL"""
-        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-
-    @property
-    def sync_database_url(self) -> str:
-        """获取同步数据库连接 URL（用于创建表）"""
-        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        return f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
 
 # 全局配置实例
