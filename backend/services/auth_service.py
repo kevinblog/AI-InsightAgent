@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
 
-import jwt
+from jose import jwt
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
