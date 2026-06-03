@@ -25,7 +25,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from database import get_db, init_database, async_session_maker
-from models import User, Article, Concept, UserFavorite
+from models import User, Article, Concept, UserFavorite, VerificationCode
+from config import config
+from fastapi import Header
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
 # ============================================
@@ -93,6 +96,75 @@ class FavoriteResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ============================================
+# 认证相关模型
+# ============================================
+
+class SendCodeRequest(BaseModel):
+    """发送验证码请求"""
+    email: str = Field(..., min_length=5, max_length=255)
+
+
+class SendCodeResponse(BaseModel):
+    """发送验证码响应"""
+    success: bool
+    message: str
+
+
+class LoginRequest(BaseModel):
+    """登录请求"""
+    email: str = Field(..., min_length=5, max_length=255)
+    code: str = Field(..., min_length=4, max_length=10)
+
+
+class UserResponse(BaseModel):
+    """用户响应模型"""
+    id: uuid.UUID
+    email: str
+    is_vip: bool
+    vip_expire_at: Optional[datetime] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class LoginResponse(BaseModel):
+    """登录响应"""
+    success: bool
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
+    user: UserResponse
+
+
+class TokenRefreshRequest(BaseModel):
+    """Token 刷新请求（可选）"""
+    pass
+
+
+# ============================================
+# 初始化服务
+# ============================================
+
+from services.email_service import EmailService, DummyEmailService
+from services.auth_service import JWTService, AuthService
+
+# 初始化 JWT 服务
+jwt_service = JWTService(config)
+
+# 选择邮件服务（开发环境使用假服务，生产使用真实 SMTP）
+if config.SMTP_USER and config.SMTP_PASSWORD:
+    email_service = EmailService(config)
+    print("📧 使用真实邮件服务")
+else:
+    email_service = DummyEmailService(config)
+    print("📧 使用假邮件服务（验证码打印在控制台）")
+
+# HTTP Bearer 认证
+security = HTTPBearer()
 
 
 # ============================================
@@ -370,6 +442,152 @@ async def get_user_favorites(
     result = await db.execute(query)
     favorites = result.scalars().all()
     return favorites
+
+
+# ----------------------------------------
+# 认证接口
+# ----------------------------------------
+
+@app.post("/api/auth/send-code", response_model=SendCodeResponse)
+async def send_verification_code(
+    request: SendCodeRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """发送验证码到邮箱"""
+    from services.auth_service import VerificationCodeService
+    
+    try:
+        # 创建验证码服务
+        code_service = VerificationCodeService(config, db)
+        
+        # 生成并保存验证码
+        code = await code_service.create_verification_code(request.email)
+        
+        # 发送邮件
+        success = await email_service.send_verification_code(request.email, code)
+        
+        if success:
+            return SendCodeResponse(
+                success=True,
+                message="验证码已发送，请查收邮件"
+            )
+        else:
+            return SendCodeResponse(
+                success=False,
+                message="发送失败，请稍后重试（可能发送太频繁）"
+            )
+            
+    except Exception as e:
+        print(f"发送验证码失败: {e}")
+        return SendCodeResponse(
+            success=False,
+            message="发送失败，请稍后重试"
+        )
+
+
+@app.post("/api/auth/login", response_model=LoginResponse)
+async def login(
+    request: LoginRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """邮箱验证码登录"""
+    from services.auth_service import AuthService
+    
+    try:
+        auth_service = AuthService(db, jwt_service, config)
+        
+        result = await auth_service.login(request.email, request.code)
+        
+        if result.success and result.user:
+            return LoginResponse(
+                success=True,
+                access_token=result.access_token,
+                token_type=result.token_type,
+                expires_in=result.expires_in,
+                user=UserResponse(
+                    id=result.user.id,
+                    email=result.user.phone,
+                    is_vip=result.user.is_vip,
+                    vip_expire_at=result.user.vip_expire_at,
+                    created_at=result.user.created_at
+                )
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=result.error or "验证码无效"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"登录失败: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="登录失败，请稍后重试"
+        )
+
+
+@app.get("/api/auth/me", response_model=UserResponse)
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db)
+):
+    """获取当前登录用户信息"""
+    from services.auth_service import AuthService
+    
+    auth_service = AuthService(db, jwt_service, config)
+    
+    user = await auth_service.get_current_user(credentials.credentials)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token 无效或已过期"
+        )
+    
+    return UserResponse(
+        id=user.id,
+        email=user.phone,
+        is_vip=user.is_vip,
+        vip_expire_at=user.vip_expire_at,
+        created_at=user.created_at
+    )
+
+
+@app.post("/api/auth/refresh")
+async def refresh_token(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """刷新访问 Token（可选实现）"""
+    # 验证并刷新 Token
+    user_id = jwt_service.get_user_id_from_token(credentials.credentials)
+    
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token 无效"
+        )
+    
+    # 简单实现：直接查询用户并返回新 Token
+    # 实际项目可以添加 Refresh Token 机制
+    from sqlalchemy import select
+    from database import async_session_maker
+    
+    async with async_session_maker() as db:
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="用户不存在")
+        
+        new_token = jwt_service.create_access_token(user)
+        
+        return {
+            "access_token": new_token,
+            "token_type": "bearer",
+            "expires_in": config.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        }
 
 
 # ----------------------------------------

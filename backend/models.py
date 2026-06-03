@@ -295,3 +295,36 @@ class UserFavorite(Base):
 
     def __repr__(self):
         return f"<UserFavorite(user_id={self.user_id}, type={self.target_type}, id={self.target_id})>"
+
+
+class VerificationCode(Base):
+    """
+    验证码表
+
+    存储邮箱登录验证码
+    """
+    __tablename__ = "verification_codes"
+
+    # 主键：自增 ID
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+    # 邮箱地址
+    email: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+
+    # 验证码（6位数字）
+    code: Mapped[str] = mapped_column(String(10), nullable=False)
+
+    # 过期时间
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    # 是否已验证
+    verified: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # 创建时间
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
+
+    def __repr__(self):
+        return f"<VerificationCode(email={self.email}, code={self.code})>"
