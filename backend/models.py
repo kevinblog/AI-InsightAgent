@@ -33,16 +33,6 @@ class JSONEncoded(TypeDecorator):
         return value
 
 
-# 尝试使用 PostgreSQL 的 JSONB，不支持时使用 JSON
-try:
-    from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSON as PG_JSON
-    SQLAlchemyJSON = PG_JSON
-    SQLAlchemyUUID = PG_UUID
-except ImportError:
-    SQLAlchemyJSON = JSONEncoded
-    SQLAlchemyUUID = String(36)
-
-
 def generate_uuid():
     return str(uuid.uuid4())
 
@@ -59,8 +49,6 @@ class User(Base):
     last_usage_reset: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-
-    favorites: Mapped[List["UserFavorite"]] = relationship("UserFavorite", back_populates="user", cascade="all, delete-orphan")
 
     @property
     def is_vip(self) -> bool:
@@ -90,8 +78,6 @@ class Article(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    favorites: Mapped[List["UserFavorite"]] = relationship("UserFavorite", back_populates="article", cascade="all, delete-orphan")
-
 
 class Concept(Base):
     """概念表"""
@@ -116,22 +102,18 @@ class Concept(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    favorites: Mapped[List["UserFavorite"]] = relationship("UserFavorite", back_populates="concept", cascade="all, delete-orphan")
-
 
 class UserFavorite(Base):
     """用户收藏表"""
     __tablename__ = "user_favorites"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
     target_type: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
     target_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     is_saved: Mapped[bool] = mapped_column(Boolean, default=True)
     feedback: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-    user: Mapped["User"] = relationship("User", back_populates="favorites")
 
     __table_args__ = (
         UniqueConstraint("user_id", "target_type", "target_id", name="uq_user_target"),
@@ -156,11 +138,11 @@ class UserFeedback(Base):
     __tablename__ = "user_feedbacks"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
     user_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     feedback_type: Mapped[str] = mapped_column(String(20), default="general")
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    related_concept_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("concepts.id", ondelete="SET NULL"), nullable=True)
+    related_concept_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="pending")
     admin_reply: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
