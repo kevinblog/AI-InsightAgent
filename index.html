@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/lucide@2.0.0/dist/lucide.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <!-- 开发者配置（请在 config.js 中填入 API Key）-->
+    <script src="config.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -323,26 +325,34 @@
     </div>
 
     <script>
-        // ==================== API 配置 ====================
-        // 安全存储：从 localStorage 获取 API Key（避免硬编码）
+        // ==================== API 配置（从 config.js 读取）================
         function getAPIKey() {
-            return localStorage.getItem('ai_pulse_api_key') || '';
+            return window.AI_PULSE_CONFIG?.apiKey || '';
         }
 
-        function setAPIKey(key) {
-            localStorage.setItem('ai_pulse_api_key', key);
+        function getAPIConfig() {
+            return {
+                apiKey: window.AI_PULSE_CONFIG?.apiKey || '',
+                apiBaseUrl: window.AI_PULSE_CONFIG?.apiBaseUrl || 'https://api.openai.com/v1',
+                model: window.AI_PULSE_CONFIG?.model || 'gpt-4o'
+            };
+        }
+
+        function isAPIConfigured() {
+            const config = getAPIConfig();
+            return config.apiKey && config.apiKey !== 'YOUR_API_KEY_HERE';
         }
 
         function saveAPIKey() {
             const input = document.getElementById('apiKeyInput');
             if (input && input.value.trim()) {
-                setAPIKey(input.value.trim());
-                alert('API Key 已保存！');
+                if (!window.AI_PULSE_CONFIG) window.AI_PULSE_CONFIG = {};
+                window.AI_PULSE_CONFIG.apiKey = input.value.trim();
+                alert('API Key 已临时保存！（刷新页面后需重新设置）');
             }
         }
 
-        const API_BASE_URL = 'https://api.openai.com/v1'; // 可修改为 DeepSeek 等其他兼容 OpenAI 格式的 API 地址
-        const API_MODEL = 'gpt-4o'; // 使用的模型名称，可根据实际服务修改
+        const API_CONFIG = getAPIConfig();
         
         let currentArticle = null; // 当前打开的文章对象
 
@@ -685,9 +695,8 @@
             messagesContainer.appendChild(botMessage);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // 检查是否有 API Key
-            const API_KEY = getAPIKey();
-            if (!API_KEY) {
+            // 检查是否已配置 API Key（开发者统一配置）
+            if (!isAPIConfigured()) {
                 botMessage.innerHTML = `
                     <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -695,12 +704,8 @@
                         </svg>
                     </div>
                     <div class="bg-white rounded-xl p-3 shadow-sm">
-                        <p class="text-sm text-red-600">请先设置 API Key！</p>
-                        <div class="mt-2 flex gap-2">
-                            <input type="password" id="apiKeyInput" placeholder="输入 API Key" class="flex-1 px-2 py-1 text-xs border rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <button onclick="saveAPIKey()" class="text-xs px-3 py-1 bg-primary-500 text-white rounded hover:bg-primary-600">保存</button>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1">您可以使用 OpenAI 或 DeepSeek 等兼容 OpenAI 格式的 API。</p>
+                        <p class="text-sm text-red-600">AI 功能未配置！</p>
+                        <p class="text-xs text-gray-500 mt-1">请联系网站开发者配置 API Key 后使用 AI 智能讨论功能。</p>
                     </div>
                 `;
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
