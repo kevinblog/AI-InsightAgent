@@ -28,6 +28,13 @@ class Config:
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "ai_pulse")
 
+    # ============================================
+    # AI API 配置（用于内容处理 Pipeline）
+    # ============================================
+    AI_API_KEY: str = os.getenv("AI_API_KEY", "")
+    AI_API_BASE_URL: str = os.getenv("AI_API_BASE_URL", "https://api.deepseek.com")
+    AI_MODEL: str = os.getenv("AI_MODEL", "deepseek-chat")
+
     @property
     def database_url(self) -> str:
         """获取数据库连接 URL"""

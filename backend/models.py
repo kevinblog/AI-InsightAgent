@@ -61,6 +61,18 @@ class User(Base):
         onupdate=func.now()
     )
 
+    # ============================================
+    # Pipeline 新增字段
+    # ============================================
+    # 状态：active | pending | rejected
+    status: Mapped[str] = mapped_column(String(20), default="active")
+
+    # 来源文章 ID 列表（JSON 数组）
+    source_articles: Mapped[Optional[List[int]]] = mapped_column(JSON, nullable=True)
+
+    # 置信度
+    confidence: Mapped[float] = mapped_column(Float, default=1.0)
+
     # 关系
     favorites: Mapped[List["UserFavorite"]] = relationship(
         "UserFavorite",
@@ -122,6 +134,15 @@ class Article(Base):
 
     # 来源
     source: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+
+    # 来源标识（techcrunch_ai, hackernews, arxiv_csai 等）
+    source_feed: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)
+
+    # 英文原文标题
+    original_title: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+
+    # AI 提取的概念（JSON 数组）
+    ai_concepts: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
 
     # 时间戳
     created_at: Mapped[datetime] = mapped_column(
