@@ -806,6 +806,150 @@ async def get_user_stats(
 
 
 # ============================================
+# 管理员接口
+# ============================================
+
+from services.admin_service import DashboardService, ConceptReviewService, FeedbackService
+from pydantic import BaseModel
+from typing import Optional, List
+
+
+class AlignConceptRequest(BaseModel):
+    chinese_equivalent: str
+
+
+class ReplyFeedbackRequest(BaseModel):
+    reply: str
+
+
+class ConceptResponse(BaseModel):
+    id: int
+    name: str
+    category: Optional[str] = None
+    definition: Optional[str] = None
+    hot_score: float
+    status: str
+    confidence: float
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FeedbackResponse(BaseModel):
+    id: int
+    user_email: Optional[str] = None
+    feedback_type: str
+    content: str
+    status: str
+    admin_reply: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+@app.get("/api/admin/dashboard/stats")
+async def get_dashboard_stats(db: AsyncSession = Depends(get_db)):
+    stats = await DashboardService.get_stats(db)
+    return stats
+
+
+@app.get("/api/admin/concepts/pending", response_model=List[ConceptResponse])
+async def get_pending_concepts(limit: int = 50, db: AsyncSession = Depends(get_db)):
+    concepts = await ConceptReviewService.get_pending_concepts(db, limit)
+    return concepts
+
+
+@app.get("/api/admin/concepts/active", response_model=List[ConceptResponse])
+async def get_active_concepts(limit: int = 50, db: AsyncSession = Depends(get_db)):
+    concepts = await ConceptReviewService.get_active_concepts(db, limit)
+    return concepts
+
+
+@app.get("/api/admin/concepts/baseline", response_model=List[ConceptResponse])
+async def get_baseline_concepts(limit: int = 50, db: AsyncSession = Depends(get_db)):
+    concepts = await ConceptReviewService.get_baseline_concepts(db, limit)
+    return concepts
+
+
+@app.post("/api/admin/concepts/{concept_id}/approve")
+async def approve_concept(concept_id: int, db: AsyncSession = Depends(get_db)):
+    success = await ConceptReviewService.approve_concept(db, concept_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="概念不存在")
+    return {"success": True, "message": "概念已通过"}
+
+
+@app.post("/api/admin/concepts/{concept_id}/reject")
+async def reject_concept(concept_id: int, db: AsyncSession = Depends(get_db)):
+    success = await ConceptReviewService.reject_concept(db, concept_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="概念不存在")
+    return {"success": True, "message": "概念已拒绝"}
+
+
+@app.post("/api/admin/concepts/{concept_id}/baseline")
+async def set_concept_baseline(concept_id: int, db: AsyncSession = Depends(get_db)):
+    success = await ConceptReviewService.set_baseline(db, concept_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="概念不存在")
+    return {"success": True, "message": "已设置为 Baseline"}
+
+
+@app.post("/api/admin/concepts/{concept_id}/align")
+async def align_concept(concept_id: int, request: AlignConceptRequest, db: AsyncSession = Depends(get_db)):
+    success = await ConceptReviewService.align_concept(db, concept_id, request.chinese_equivalent)
+    if not success:
+        raise HTTPException(status_code=404, detail="概念不存在")
+    return {"success": True, "message": f"已对齐到：{request.chinese_equivalent}"}
+
+
+@app.get("/api/admin/concepts/{concept_id}/suggest-alignment")
+async def suggest_concept_alignment(concept_id: int, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    result = await db.execute(select(Concept).where(Concept.id == concept_id))
+    concept = result.scalar_one_or_none()
+    if not concept:
+        raise HTTPException(status_code=404, detail="概念不存在")
+    suggestions = ConceptReviewService.get_suggested_alignment(concept.name)
+    return {"concept_id": concept_id, "concept_name": concept.name, "suggestions": suggestions or []}
+
+
+@app.get("/api/admin/feedbacks", response_model=List[FeedbackResponse])
+async def get_feedbacks(status: Optional[str] = None, limit: int = 50, db: AsyncSession = Depends(get_db)):
+    if status == "pending":
+        feedbacks = await FeedbackService.get_pending_feedbacks(db, limit)
+    else:
+        feedbacks = await FeedbackService.get_all_feedbacks(db, status, limit)
+    return feedbacks
+
+
+@app.post("/api/admin/feedbacks/{feedback_id}/resolve")
+async def resolve_feedback(feedback_id: int, db: AsyncSession = Depends(get_db)):
+    success = await FeedbackService.resolve_feedback(db, feedback_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="反馈不存在")
+    return {"success": True, "message": "反馈已标记为已处理"}
+
+
+@app.post("/api/admin/feedbacks/{feedback_id}/dismiss")
+async def dismiss_feedback(feedback_id: int, db: AsyncSession = Depends(get_db)):
+    success = await FeedbackService.dismiss_feedback(db, feedback_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="反馈不存在")
+    return {"success": True, "message": "反馈已忽略"}
+
+
+@app.post("/api/admin/feedbacks/{feedback_id}/reply")
+async def reply_feedback(feedback_id: int, request: ReplyFeedbackRequest, db: AsyncSession = Depends(get_db)):
+    success = await FeedbackService.reply_feedback(db, feedback_id, request.reply)
+    if not success:
+        raise HTTPException(status_code=404, detail="反馈不存在")
+    return {"success": True, "message": "已回复反馈"}
+
+
+# ============================================
 # 启动服务
 # ============================================
 
