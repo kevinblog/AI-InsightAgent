@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 行业动态与概念库</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/lucide@2.0.0/dist/lucide.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .tag-active {
+            background: linear-gradient(135deg, #0ea5e9 0%, #d946ef 100%);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #0ea5e9 0%, #d946ef 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 min-h-screen">
+    <nav class="glass-effect sticky top-0 z-50 border-b border-white/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">AI 概念库</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+                    </button>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center">
+                        <span class="text-white text-sm font-medium">P</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-12 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                <span class="gradient-text">AI 行业动态</span>与概念库
+            </h1>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto mb-8">
+                探索人工智能领域的核心概念，追踪行业最新动态，成为 AI 领域的专业人士
+            </p>
+            <div class="relative max-w-xl mx-auto">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    placeholder="搜索 AI 概念、技术或动态..." 
+                    class="w-full pl-12 pr-4 py-3 bg-white/70 backdrop-blur-md border border-gray-200 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all"
+                />
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">分类筛选</h2>
+                <button id="clearFilter" class="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    清除筛选
+                </button>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-tag tag-active px-4 py-2 rounded-full text-sm font-medium text-white">全部</button>
+                <button class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/70 hover:bg-white border border-gray-200 text-gray-700 transition-all">大语言模型</button>
+                <button class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/70 hover:bg-white border border-gray-200 text-gray-700 transition-all">计算机视觉</button>
+                <button class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/70 hover:bg-white border border-gray-200 text-gray-700 transition-all">自然语言处理</button>
+                <button class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/70 hover:bg-white border border-gray-200 text-gray-700 transition-all">机器学习</button>
+                <button class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/70 hover:bg-white border border-gray-200 text-gray-700 transition-all">深度学习</button>
+                <button class="filter-tag px-4 py-2 rounded-full text-sm font-medium bg-white/70 hover:bg-white border border-gray-200 text-gray-700 transition-all">多模态</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="conceptCards">
+            </div>
+        </div>
+
+        <div class="mt-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">行业动态</h2>
+                <button class="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1">
+                    查看全部
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="newsFeed">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-50 border-t border-gray-200 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span class="font-semibold gradient-text">AI 概念库</span>
+                </div>
+                <p class="text-sm text-gray-500">2024 AI 行业动态与概念库 | 产品经理专属知识库</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mockConcepts = [
+            {
+                id: 1,
+                title: '大语言模型 (LLM)',
+                category: '大语言模型',
+                definition: '大语言模型是一种基于深度学习的人工智能系统，能够理解和生成人类语言。它们通过学习海量文本数据，掌握语言模式和知识，能够完成对话、写作、翻译等多种任务。',
+                hot: true,
+                icon: 'brain',
+                tags: ['GPT', 'Transformer', 'NLP'],
+                views: 12580,
+                likes: 320,
+                saved: false
+            },
+            {
+                id: 2,
+                title: '生成式 AI',
+                category: '机器学习',
+                definition: '生成式AI是一类能够创建新内容的人工智能系统，包括文本、图像、音频和视频等。它通过学习数据的潜在分布，能够生成与训练数据相似但全新的内容。',
+                hot: true,
+                icon: 'sparkles',
+                tags: ['扩散模型', 'GAN', '内容创作'],
+                views: 8920,
+                likes: 256,
+                saved: true
+            },
+            {
+                id: 3,
+                title: '计算机视觉',
+                category: '计算机视觉',
+                definition: '计算机视觉是人工智能的一个分支，使计算机能够理解和解释图像和视频内容。它包括图像识别、目标检测、图像分割、人脸识别等技术。',
+                hot: false,
+                icon: 'image',
+                tags: ['CNN', '图像识别', '目标检测'],
+                views: 6750,
+                likes: 189,
+                saved: false
+            },
+            {
+                id: 4,
+                title: '自然语言处理',
+                category: '自然语言处理',
+                definition: '自然语言处理是人工智能的一个领域，致力于使计算机能够理解、解释和生成人类语言。它包括文本分析、情感分析、机器翻译、问答系统等应用。',
+                hot: false,
+                icon: 'message-circle',
+                tags: ['NLP', '文本分析', '情感分析'],
+                views: 5430,
+                likes: 145,
+                saved: false
+            },
+            {
+                id: 5,
+                title: '深度学习',
+                category: '深度学习',
+                definition: '深度学习是机器学习的一个子领域，使用多层神经网络来模拟人脑的学习过程。它能够自动从原始数据中学习特征表示，在图像识别、语音识别等领域取得了突破性进展。',
+                hot: false,
+                icon: 'network',
+                tags: ['神经网络', 'CNN', 'RNN'],
+                views: 4320,
+                likes: 123,
+                saved: true
+            },
+            {
+                id: 6,
+                title: '多模态 AI',
+                category: '多模态',
+                definition: '多模态AI是指能够处理和理解多种类型数据的人工智能系统，包括文本、图像、音频、视频等。它能够整合不同模态的信息，提供更全面的理解和更丰富的交互体验。',
+                hot: true,
+                icon: 'layers',
+                tags: ['多模态学习', '跨模态', '融合'],
+                views: 7890,
+                likes: 234,
+                saved: false
+            },
+            {
+                id: 7,
+                title: 'Transformer',
+                category: '深度学习',
+                definition: 'Transformer是一种基于自注意力机制的深度学习架构，由Google在2017年提出。它是现代大语言模型的基础，能够有效处理序列数据，在机器翻译和自然语言理解方面取得了革命性进展。',
+                hot: true,
+                icon: 'git-merge',
+                tags: ['注意力机制', 'BERT', 'GPT'],
+                views: 9230,
+                likes: 287,
+                saved: false
+            },
+            {
+                id: 8,
+                title: '强化学习',
+                category: '机器学习',
+                definition: '强化学习是机器学习的一种范式，通过智能体与环境的交互来学习最优行为策略。智能体通过试错获得奖励信号，逐渐优化决策能力，在游戏、机器人控制等领域有广泛应用。',
+                hot: false,
+                icon: 'target',
+                tags: ['RL', '策略学习', '奖励机制'],
+                views: 3890,
+                likes: 98,
+                saved: false
+            },
+            {
+                id: 9,
+                title: '扩散模型',
+                category: '机器学习',
+                definition: '扩散模型是一种生成模型，通过逐步添加噪声然后再去除噪声的过程来生成数据。它在图像生成领域取得了惊人的成果，能够生成高质量的逼真图像。',
+                hot: true,
+                icon: 'wind',
+                tags: ['Stable Diffusion', '图像生成', 'DALL-E'],
+                views: 11560,
+                likes: 345,
+                saved: false
+            }
+        ];
+
+        const mockNews = [
+            {
+                id: 1,
+                title: 'OpenAI 发布 GPT-5 预览版，性能提升 300%',
+                source: 'TechCrunch',
+                date: '2小时前',
+                category: '大语言模型',
+                image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=AI%20neural%20network%20technology%20abstract%20blue%20gradient&image_size=landscape_16_9'
+            },
+            {
+                id: 2,
+                title: '谷歌推出新一代 Gemini 模型，支持多模态理解',
+                source: 'The Verge',
+                date: '5小时前',
+                category: '多模态',
+                image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=colorful%20AI%20brain%20with%20multiple%20sensory%20inputs&image_size=landscape_16_9'
+            },
+            {
+                id: 3,
+                title: 'AI 绘画工具市场爆发，用户增长超 500%',
+                source: 'AI Trends',
+                date: '昨天',
+                category: '计算机视觉',
+                image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=digital%20art%20creation%20with%20AI%20assistance&image_size=landscape_16_9'
+            },
+            {
+                id: 4,
+                title: 'DeepMind 最新研究：AI 能够自主发现科学定理',
+                source: 'Nature',
+                date: '昨天',
+                category: '机器学习',
+                image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=scientific%20discovery%20with%20AI%20visualization&image_size=landscape_16_9'
+            }
+        ];
+
+        const iconMap = {
+            'brain': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>',
+            'sparkles': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
+            'image': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
+            'message-circle': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>',
+            'network': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>',
+            'layers': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>',
+            'git-merge': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>',
+            'target': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+            'wind': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>'
+        };
+
+        function formatNumber(num) {
+            if (num >= 10000) {
+                return (num / 10000).toFixed(1) + 'w';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num;
+        }
+
+        function renderConcepts(concepts) {
+            const container = document.getElementById('conceptCards');
+            container.innerHTML = '';
+            
+            concepts.forEach((concept, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg card-hover border border-white/50';
+                card.style.animation = `slideUp 0.5s ease-out ${index * 0.1}s both`;
+                
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-accent-100 flex items-center justify-center text-primary-600">
+                                ${iconMap[concept.icon]}
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${concept.title}</h3>
+                                <span class="text-xs px-2 py-1 rounded-full bg-primary-100 text-primary-600">${concept.category}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="save-btn p-2 rounded-lg hover:bg-gray-100 transition-colors" data-id="${concept.id}">
+                                <svg class="w-5 h-5 ${concept.saved ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-3">${concept.definition}</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        ${concept.tags.map(tag => `<span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">${tag}</span>`).join('')}
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                ${formatNumber(concept.views)}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                                ${concept.likes}
+                            </span>
+                        </div>
+                        ${concept.hot ? '<span class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600 flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> 热门</span>' : ''}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function renderNews(news) {
+            const container = document.getElementById('newsFeed');
+            container.innerHTML = '';
+            
+            news.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white/70 backdrop-blur-md rounded-xl overflow-hidden shadow-lg card-hover border border-white/50 flex';
+                card.style.animation = `slideUp 0.5s ease-out ${index * 0.15 + 0.3}s both`;
+                
+                card.innerHTML = `
+                    <div class="w-32 flex-shrink-0">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <h3 class="font-medium text-gray-800 line-clamp-2">${item.title}</h3>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span>${item.source}</span>
+                            <span>${item.date}</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-primary-100 text-primary-600">${item.category}</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderConcepts(mockConcepts);
+            renderNews(mockNews);
+
+            const filterTags = document.querySelectorAll('.filter-tag');
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    filterTags.forEach(t => t.classList.remove('tag-active', 'text-white'));
+                    tag.classList.add('tag-active', 'text-white');
+                    
+                    const category = tag.textContent;
+                    if (category === '全部') {
+                        renderConcepts(mockConcepts);
+                    } else {
+                        const filtered = mockConcepts.filter(c => c.category === category);
+                        renderConcepts(filtered);
+                    }
+                });
+            });
+
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                if (!query) {
+                    renderConcepts(mockConcepts);
+                    filterTags[0].click();
+                    return;
+                }
+                
+                const filtered = mockConcepts.filter(c => 
+                    c.title.toLowerCase().includes(query) ||
+                    c.definition.toLowerCase().includes(query) ||
+                    c.tags.some(t => t.toLowerCase().includes(query))
+                );
+                renderConcepts(filtered);
+            });
+
+            document.getElementById('clearFilter').addEventListener('click', () => {
+                filterTags[0].click();
+                searchInput.value = '';
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.save-btn')) {
+                    const btn = e.target.closest('.save-btn');
+                    const id = parseInt(btn.dataset.id);
+                    const concept = mockConcepts.find(c => c.id === id);
+                    if (concept) {
+                        concept.saved = !concept.saved;
+                        const icon = btn.querySelector('svg');
+                        if (concept.saved) {
+                            icon.classList.add('text-yellow-500', 'fill-yellow-500');
+                        } else {
+                            icon.classList.remove('text-yellow-500', 'fill-yellow-500');
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
