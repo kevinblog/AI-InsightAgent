@@ -50,6 +50,14 @@ class User(Base):
         nullable=True
     )
 
+    # 每日使用统计
+    daily_ai_usage: Mapped[int] = mapped_column(Integer, default=0)
+    daily_article_usage: Mapped[int] = mapped_column(Integer, default=0)
+    last_usage_reset: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+
     # 时间戳
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -60,18 +68,6 @@ class User(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
-
-    # ============================================
-    # Pipeline 新增字段
-    # ============================================
-    # 状态：active | pending | rejected
-    status: Mapped[str] = mapped_column(String(20), default="active")
-
-    # 来源文章 ID 列表（JSON 数组）
-    source_articles: Mapped[Optional[List[int]]] = mapped_column(JSON, nullable=True)
-
-    # 置信度
-    confidence: Mapped[float] = mapped_column(Float, default=1.0)
 
     # 关系
     favorites: Mapped[List["UserFavorite"]] = relationship(
@@ -212,6 +208,18 @@ class Concept(Base):
 
     # 点赞数
     likes: Mapped[int] = mapped_column(Integer, default=0)
+
+    # ============================================
+    # Pipeline 新增字段
+    # ============================================
+    # 状态：active | pending | rejected
+    status: Mapped[str] = mapped_column(String(20), default="active")
+
+    # 来源文章 ID 列表（JSON 数组）
+    source_articles: Mapped[Optional[List[int]]] = mapped_column(JSON, nullable=True)
+
+    # 置信度
+    confidence: Mapped[float] = mapped_column(Float, default=1.0)
 
     # 时间戳
     created_at: Mapped[datetime] = mapped_column(

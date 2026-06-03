@@ -99,6 +99,45 @@ class FavoriteResponse(BaseModel):
 
 
 # ============================================
+# 付费墙相关模型
+# ============================================
+
+class QuotaResponse(BaseModel):
+    """配额响应"""
+    is_vip: bool
+    ai_used: int
+    ai_limit: int
+    article_used: int
+    article_limit: int
+    vip_expire_at: Optional[datetime] = None
+
+
+class CheckUsageRequest(BaseModel):
+    """检查使用请求"""
+    type: str  # "ai" 或 "article"
+
+
+class CheckUsageResponse(BaseModel):
+    """检查使用响应"""
+    allowed: bool
+    message: Optional[str] = None
+
+
+class GrantVIPRequest(BaseModel):
+    """授予 VIP 请求"""
+    email: str
+    duration_days: int = 30  # 30 或 365 天
+
+
+class VIPStatusResponse(BaseModel):
+    """VIP 状态响应"""
+    user_id: uuid.UUID
+    email: str
+    is_vip: bool
+    vip_expire_at: Optional[datetime] = None
+
+
+# ============================================
 # 认证相关模型
 # ============================================
 
@@ -588,6 +627,142 @@ async def refresh_token(
             "token_type": "bearer",
             "expires_in": config.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60
         }
+
+
+# ----------------------------------------
+# 使用配额接口
+# ----------------------------------------
+
+@app.get("/api/usage/quota", response_model=QuotaResponse)
+async def get_quota(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db)
+):
+    """获取用户剩余配额"""
+    from services.auth_service import AuthService
+    from services.usage_service import UsageService
+
+    auth_service = AuthService(db, jwt_service, config)
+    user = await auth_service.get_current_user(credentials.credentials)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="未登录"
+        )
+
+    quota = await UsageService.get_quota(db, user)
+    return QuotaResponse(**quota)
+
+
+@app.post("/api/usage/check", response_model=CheckUsageResponse)
+async def check_usage(
+    request: CheckUsageRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db)
+):
+    """检查是否可以使用功能"""
+    from services.auth_service import AuthService
+    from services.usage_service import UsageService
+
+    auth_service = AuthService(db, jwt_service, config)
+    user = await auth_service.get_current_user(credentials.credentials)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="未登录"
+        )
+
+    if request.type == "ai":
+        allowed, message = await UsageService.check_ai_usage(db, user)
+        if allowed:
+            await UsageService.increment_ai_usage(db, user)
+    elif request.type == "article":
+        allowed, message = await UsageService.check_article_usage(db, user)
+        if allowed:
+            await UsageService.increment_article_usage(db, user)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="无效的类型"
+        )
+
+    return CheckUsageResponse(allowed=allowed, message=message)
+
+
+# ----------------------------------------
+# VIP 管理接口（管理员）
+# ----------------------------------------
+
+@app.post("/api/admin/vip/grant")
+async def grant_vip(
+    request: GrantVIPRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """手动授予 VIP（管理员接口）"""
+    from services.usage_service import VIPService
+
+    try:
+        user, success = await VIPService.grant_vip(db, request.email, request.duration_days)
+        return {
+            "success": success,
+            "user": {
+                "id": user.id,
+                "email": user.phone,
+                "is_vip": user.is_vip,
+                "vip_expire_at": user.vip_expire_at
+            }
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+
+
+@app.post("/api/admin/vip/revoke")
+async def revoke_vip(
+    email: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """取消 VIP（管理员接口）"""
+    from services.usage_service import VIPService
+
+    try:
+        user = await VIPService.revoke_vip(db, email)
+        return {
+            "success": True,
+            "user": {
+                "id": user.id,
+                "email": user.phone,
+                "is_vip": user.is_vip,
+                "vip_expire_at": user.vip_expire_at
+            }
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+
+
+@app.get("/api/admin/vip/search", response_model=VIPStatusResponse)
+async def search_vip(
+    email: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """查询用户 VIP 状态（管理员接口）"""
+    from services.usage_service import VIPService
+
+    try:
+        status = await VIPService.get_vip_status(db, email)
+        return VIPStatusResponse(**status)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
 
 
 # ----------------------------------------

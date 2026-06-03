@@ -211,13 +211,142 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </button>
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center">
-                        <span class="text-white text-sm font-medium">A</span>
+                    <div id="userArea" class="flex items-center gap-3">
+                        <div id="quotaDisplay" class="hidden flex items-center gap-2 text-xs text-gray-600">
+                            <span id="aiQuotaBadge" class="px-2 py-1 rounded-full bg-blue-100 text-blue-600">AI: 0/3</span>
+                            <span id="articleQuotaBadge" class="px-2 py-1 rounded-full bg-purple-100 text-purple-600">文章: 0/5</span>
+                        </div>
+                        <button id="loginBtn" class="px-4 py-2 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 text-white text-sm font-medium hover:shadow-lg transition-all">
+                            登录
+                        </button>
+                        <button id="userBtn" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-all">
+                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center">
+                                <span class="text-white text-xs font-medium" id="userInitial">U</span>
+                            </div>
+                            <span class="text-sm text-gray-700" id="userEmail">user@example.com</span>
+                            <div id="vipBadge" class="hidden text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold">
+                                VIP
+                            </div>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- 登录弹窗 -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="loginOverlay"></div>
+        <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-gray-800">登录 AI 行业脉搏</h2>
+                <button id="closeLoginModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="loginStep1" class="p-6">
+                <p class="text-gray-600 mb-4">输入邮箱接收验证码</p>
+                <input type="email" id="loginEmail" placeholder="your@email.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none mb-3">
+                <button id="sendCodeBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium hover:shadow-lg transition-all">
+                    发送验证码
+                </button>
+            </div>
+            <div id="loginStep2" class="p-6 hidden">
+                <p class="text-gray-600 mb-4">输入 6 位验证码</p>
+                <input type="text" id="loginCode" placeholder="000000" maxlength="6" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none text-center text-2xl tracking-widest mb-3">
+                <button id="loginBtnConfirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium hover:shadow-lg transition-all">
+                    登录
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 付费墙弹窗 -->
+    <div id="paywallModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="paywallOverlay"></div>
+        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">解锁无限 VIP 功能</h2>
+                    <p class="text-sm text-gray-500" id="paywallMessage">今日次数已用完</p>
+                </div>
+                <button id="closePaywallModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div id="monthlyPlan" class="p-4 rounded-xl border-2 border-primary-200 bg-gradient-to-br from-blue-50 to-purple-50 cursor-pointer plan-card">
+                        <h3 class="font-bold text-gray-800">包月</h3>
+                        <p class="text-3xl font-bold mt-2 text-gray-800">¥19.9</p>
+                        <p class="text-sm text-gray-500 mt-1">30 天 VIP</p>
+                    </div>
+                    <div id="yearlyPlan" class="p-4 rounded-xl border-2 border-primary-200 bg-gradient-to-br from-purple-50 to-pink-50 cursor-pointer plan-card">
+                        <h3 class="font-bold text-gray-800">包年</h3>
+                        <p class="text-3xl font-bold mt-2 text-gray-800">¥199.9</p>
+                        <p class="text-sm text-gray-500 mt-1">365 天 VIP</p>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 text-center">
+                    <p class="text-gray-700 mb-4">
+                        扫码支付后，请联系管理员手动开通 VIP
+                    </p>
+                    <div class="w-64 h-64 mx-auto bg-white rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-400">
+                        <span class="text-sm">赞赏码占位</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">
+                        支付后请在下方填入您的邮箱，或联系管理员：admin@example.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员后台 -->
+    <div id="adminModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="adminOverlay"></div>
+        <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-gray-800">VIP 管理后台</h2>
+                <button id="closeAdminModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-2">用户邮箱</label>
+                        <input type="email" id="adminEmail" placeholder="user@email.com" class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-primary-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-2">时长</label>
+                        <select id="adminDuration" class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-primary-500 outline-none">
+                            <option value="30">30 天</option>
+                            <option value="365">365 天</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button id="searchUserBtn" class="flex-1 px-4 py-2 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-all">
+                        查询状态
+                    </button>
+                    <button id="grantVIPBtn" class="flex-1 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium hover:shadow-lg transition-all">
+                        授予 VIP
+                    </button>
+                    <button id="revokeVIPBtn" class="px-4 py-2 rounded-xl border border-red-300 text-red-700 font-medium hover:bg-red-50 transition-all">
+                        取消 VIP
+                    </button>
+                </div>
+                <div id="adminResult" class="mt-4 text-sm text-gray-700 hidden"></div>
+            </div>
+        </div>
+    </div>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -905,6 +1034,260 @@ ${currentArticle.content}
                     
                     renderConcepts(mockConcepts, tag.textContent);
                 });
+            });
+
+            // ========================================
+            // 用户认证与付费墙
+            // ========================================
+            
+            const API_BASE = 'http://localhost:8000';
+            let currentUser = null;
+            let currentQuota = null;
+
+            // 显示/隐藏登录状态
+            function updateAuthUI() {
+                const loginBtn = document.getElementById('loginBtn');
+                const userBtn = document.getElementById('userBtn');
+                const quotaDisplay = document.getElementById('quotaDisplay');
+                const vipBadge = document.getElementById('vipBadge');
+
+                if (currentUser) {
+                    loginBtn.classList.add('hidden');
+                    userBtn.classList.remove('hidden');
+                    document.getElementById('userEmail').textContent = currentUser.email;
+                    document.getElementById('userInitial').textContent = currentUser.email[0].toUpperCase();
+
+                    if (currentQuota) {
+                        quotaDisplay.classList.remove('hidden');
+                        if (currentQuota.is_vip) {
+                            document.getElementById('aiQuotaBadge').textContent = 'AI: ∞';
+                            document.getElementById('articleQuotaBadge').textContent = '文章: ∞';
+                            vipBadge.classList.remove('hidden');
+                        } else {
+                            document.getElementById('aiQuotaBadge').textContent = `AI: ${currentQuota.ai_used}/${currentQuota.ai_limit}`;
+                            document.getElementById('articleQuotaBadge').textContent = `文章: ${currentQuota.article_used}/${currentQuota.article_limit}`;
+                            vipBadge.classList.add('hidden');
+                        }
+                    }
+                } else {
+                    loginBtn.classList.remove('hidden');
+                    userBtn.classList.add('hidden');
+                    quotaDisplay.classList.add('hidden');
+                }
+            }
+
+            // 获取配额
+            async function fetchQuota() {
+                if (!localStorage.getItem('authToken')) return;
+                try {
+                    const response = await fetch(`${API_BASE}/api/usage/quota`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+                    if (response.ok) {
+                        currentQuota = await response.json();
+                        updateAuthUI();
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch quota:', e);
+                }
+            }
+
+            // 检查使用配额
+            async function checkUsage(type) {
+                if (!localStorage.getItem('authToken')) {
+                    openLoginModal();
+                    return false;
+                }
+                try {
+                    const response = await fetch(`${API_BASE}/api/usage/check`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({ type })
+                    });
+                    const data = await response.json();
+                    if (data.allowed) {
+                        fetchQuota();
+                        return true;
+                    } else {
+                        document.getElementById('paywallMessage').textContent = data.message || '今日次数已用完';
+                        openPaywallModal();
+                        return false;
+                    }
+                } catch (e) {
+                    console.error('Failed to check usage:', e);
+                    return false;
+                }
+            }
+
+            // 包装发送消息，检查配额
+            const originalSendMessage = sendMessage;
+            sendMessage = async function() {
+                const allowed = await checkUsage('ai');
+                if (allowed) {
+                    originalSendMessage.apply(this, arguments);
+                }
+            };
+
+            // 包装打开文章，检查配额
+            const originalOpenArticleModal = openArticleModal;
+            openArticleModal = async function(id) {
+                const allowed = await checkUsage('article');
+                if (allowed) {
+                    originalOpenArticleModal.apply(this, arguments);
+                }
+            };
+
+            // 登录弹窗
+            document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+            document.getElementById('closeLoginModal').addEventListener('click', closeLoginModal);
+            document.getElementById('loginOverlay').addEventListener('click', closeLoginModal);
+
+            function openLoginModal() {
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('loginStep1').classList.remove('hidden');
+                document.getElementById('loginStep2').classList.add('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeLoginModal() {
+                document.getElementById('loginModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            // 发送验证码
+            document.getElementById('sendCodeBtn').addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                if (!email) return;
+                try {
+                    const response = await fetch(`${API_BASE}/api/auth/send-code`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    if (response.ok) {
+                        document.getElementById('loginStep1').classList.add('hidden');
+                        document.getElementById('loginStep2').classList.remove('hidden');
+                    }
+                } catch (e) {
+                    console.error('Failed to send code:', e);
+                }
+            });
+
+            // 登录
+            document.getElementById('loginBtnConfirm').addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                const code = document.getElementById('loginCode').value;
+                try {
+                    const response = await fetch(`${API_BASE}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, code })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        localStorage.setItem('authToken', data.access_token);
+                        currentUser = data.user;
+                        closeLoginModal();
+                        updateAuthUI();
+                        fetchQuota();
+                    }
+                } catch (e) {
+                    console.error('Login failed:', e);
+                }
+            });
+
+            // 付费墙弹窗
+            document.getElementById('closePaywallModal').addEventListener('click', () => {
+                document.getElementById('paywallModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            document.getElementById('paywallOverlay').addEventListener('click', () => {
+                document.getElementById('paywallModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            function openPaywallModal() {
+                document.getElementById('paywallModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // 管理员后台 (快速打开方式，生产环境应加权限验证)
+            let adminOpenCount = 0;
+            document.getElementById('userBtn').addEventListener('click', () => {
+                adminOpenCount++;
+                if (adminOpenCount >= 5) {
+                    adminOpenCount = 0;
+                    openAdminModal();
+                }
+            });
+            document.getElementById('closeAdminModal').addEventListener('click', () => {
+                document.getElementById('adminModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            document.getElementById('adminOverlay').addEventListener('click', () => {
+                document.getElementById('adminModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            function openAdminModal() {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // 管理员操作
+            document.getElementById('searchUserBtn').addEventListener('click', async () => {
+                const email = document.getElementById('adminEmail').value;
+                try {
+                    const response = await fetch(`${API_BASE}/api/admin/vip/search?email=${encodeURIComponent(email)}`);
+                    const data = await response.json();
+                    document.getElementById('adminResult').innerHTML = `
+                        用户: ${data.email}<br>
+                        VIP: ${data.is_vip ? '是' : '否'}<br>
+                        到期: ${data.vip_expire_at || '无'}
+                    `;
+                    document.getElementById('adminResult').classList.remove('hidden');
+                } catch (e) {
+                    document.getElementById('adminResult').textContent = '查询失败';
+                    document.getElementById('adminResult').classList.remove('hidden');
+                }
+            });
+            document.getElementById('grantVIPBtn').addEventListener('click', async () => {
+                const email = document.getElementById('adminEmail').value;
+                const duration = parseInt(document.getElementById('adminDuration').value);
+                try {
+                    const response = await fetch(`${API_BASE}/api/admin/vip/grant`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, duration_days: duration })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('adminResult').textContent = 'VIP 授予成功!';
+                        document.getElementById('adminResult').classList.remove('hidden');
+                    }
+                } catch (e) {
+                    document.getElementById('adminResult').textContent = '操作失败';
+                    document.getElementById('adminResult').classList.remove('hidden');
+                }
+            });
+            document.getElementById('revokeVIPBtn').addEventListener('click', async () => {
+                const email = document.getElementById('adminEmail').value;
+                try {
+                    const response = await fetch(`${API_BASE}/api/admin/vip/revoke?email=${encodeURIComponent(email)}`, {
+                        method: 'POST'
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('adminResult').textContent = 'VIP 已取消';
+                        document.getElementById('adminResult').classList.remove('hidden');
+                    }
+                } catch (e) {
+                    document.getElementById('adminResult').textContent = '操作失败';
+                    document.getElementById('adminResult').classList.remove('hidden');
+                }
             });
         });
     </script>
