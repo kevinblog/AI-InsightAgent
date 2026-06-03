@@ -6,6 +6,7 @@
     <title>AI 行业脉搏</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/lucide@2.0.0/dist/lucide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -149,6 +150,24 @@
             overflow: hidden;
         }
     </style>
+    <script>
+        // ==================== 安全工具函数 ====================
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return str;
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function isValidImageUrl(url) {
+            try {
+                const urlObj = new URL(url);
+                return ['http:', 'https:'].includes(urlObj.protocol);
+            } catch {
+                return false;
+            }
+        }
+    </script>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
     <header class="glass-effect sticky top-0 z-50 border-b border-white/30">
@@ -305,7 +324,23 @@
 
     <script>
         // ==================== API 配置 ====================
-        const API_KEY = 'YOUR_API_KEY_HERE'; // 请在这里填写您的 API Key
+        // 安全存储：从 localStorage 获取 API Key（避免硬编码）
+        function getAPIKey() {
+            return localStorage.getItem('ai_pulse_api_key') || '';
+        }
+
+        function setAPIKey(key) {
+            localStorage.setItem('ai_pulse_api_key', key);
+        }
+
+        function saveAPIKey() {
+            const input = document.getElementById('apiKeyInput');
+            if (input && input.value.trim()) {
+                setAPIKey(input.value.trim());
+                alert('API Key 已保存！');
+            }
+        }
+
         const API_BASE_URL = 'https://api.openai.com/v1'; // 可修改为 DeepSeek 等其他兼容 OpenAI 格式的 API 地址
         const API_MODEL = 'gpt-4o'; // 使用的模型名称，可根据实际服务修改
         
@@ -466,19 +501,21 @@
                 item.style.animation = `slideUp 0.3s ease-out ${index * 0.05}s both`;
                 item.dataset.id = article.id;
 
-                item.innerHTML = `
+                const safeImageUrl = isValidImageUrl(article.image) ? article.image : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2248%22 viewBox=%220 0 64 48%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2264%22 height=%2248%22/%3E%3C/svg%3E';
+
+                item.innerHTML = DOMPurify.sanitize(`
                     <div class="w-16 h-12 flex-shrink-0 rounded-lg overflow-hidden">
-                        <img src="${article.image}" alt="${article.title}" class="w-full h-full object-cover">
+                        <img src="${safeImageUrl}" alt="${escapeHTML(article.title)}" class="w-full h-full object-cover">
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             ${article.hot ? '<span class="text-xs px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 flex items-center gap-0.5"><svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span>' : ''}
-                            <span class="text-xs text-gray-400">${article.date}</span>
+                            <span class="text-xs text-gray-400">${escapeHTML(article.date)}</span>
                         </div>
-                        <h3 class="text-sm font-medium text-gray-800 line-clamp-2">${article.title}</h3>
-                        <p class="text-xs text-gray-500 mt-1">${article.source}</p>
+                        <h3 class="text-sm font-medium text-gray-800 line-clamp-2">${escapeHTML(article.title)}</h3>
+                        <p class="text-xs text-gray-500 mt-1">${escapeHTML(article.source)}</p>
                     </div>
-                `;
+                `);
 
                 container.appendChild(item);
             });
@@ -500,15 +537,15 @@
                 card.className = 'bg-white rounded-xl p-5 shadow-sm card-hover border border-gray-100';
                 card.style.animation = `slideUp 0.4s ease-out ${index * 0.08}s both`;
 
-                card.innerHTML = `
+                card.innerHTML = DOMPurify.sanitize(`
                     <div class="flex items-start justify-between mb-3">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-50 to-accent-50 flex items-center justify-center text-primary-600">
-                                ${iconMap[concept.icon]}
+                                ${iconMap[concept.icon] || ''}
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-800">${concept.title}</h3>
-                                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${concept.category}</span>
+                                <h3 class="font-semibold text-gray-800">${escapeHTML(concept.title)}</h3>
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${escapeHTML(concept.category)}</span>
                             </div>
                         </div>
                         <div class="flex gap-1">
@@ -516,9 +553,9 @@
                             ${concept.recommended ? '<span class="text-xs px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600">推荐</span>' : ''}
                         </div>
                     </div>
-                    <p class="text-sm text-gray-600 line-clamp-2 mb-3">${concept.definition}</p>
+                    <p class="text-sm text-gray-600 line-clamp-2 mb-3">${escapeHTML(concept.definition)}</p>
                     <div class="flex flex-wrap gap-1.5 mb-3">
-                        ${concept.tags.map(tag => `<span class="text-xs px-2 py-0.5 rounded-full bg-primary-50 text-primary-600">${tag}</span>`).join('')}
+                        ${concept.tags.map(tag => `<span class="text-xs px-2 py-0.5 rounded-full bg-primary-50 text-primary-600">${escapeHTML(tag)}</span>`).join('')}
                     </div>
                     <div class="flex items-center justify-between pt-3 border-t border-gray-100">
                         <div class="flex items-center gap-3 text-xs text-gray-500">
@@ -542,7 +579,7 @@
                             </svg>
                         </button>
                     </div>
-                `;
+                `);
 
                 container.appendChild(card);
             });
@@ -556,17 +593,20 @@
 
             document.getElementById('modalCategory').textContent = article.category;
             document.getElementById('modalSource').textContent = `${article.source} · ${article.date}`;
-            document.getElementById('articleContent').innerHTML = `
-                <h1 class="text-2xl font-bold text-gray-800 mb-4">${article.title}</h1>
-                <img src="${article.image}" alt="${article.title}" class="w-full h-64 object-cover rounded-xl mb-6">
-                ${article.content.replace(/## (.+)/g, '<h2 class="text-xl font-semibold text-gray-800 mt-6 mb-3">$1</h2>')
+
+            const safeImageUrl = isValidImageUrl(article.image) ? article.image : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%25%22 height=%22256%22 viewBox=%220 0 100 256%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22100%22 height=%22256%22/%3E%3C/svg%3E';
+
+            document.getElementById('articleContent').innerHTML = DOMPurify.sanitize(`
+                <h1 class="text-2xl font-bold text-gray-800 mb-4">${escapeHTML(article.title)}</h1>
+                <img src="${safeImageUrl}" alt="${escapeHTML(article.title)}" class="w-full h-64 object-cover rounded-xl mb-6">
+                ${escapeHTML(article.content).replace(/## (.+)/g, '<h2 class="text-xl font-semibold text-gray-800 mt-6 mb-3">$1</h2>')
                                 .replace(/### (.+)/g, '<h3 class="text-lg font-semibold text-gray-700 mt-4 mb-2">$1</h3>')
                                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                                 .replace(/\|(.+)\|/g, '<div class="bg-gray-50 rounded-lg p-4 mb-4">$1</div>')
                                 .replace(/^- (.+)$/gm, '<li class="ml-4 mb-1">$1</li>')
                                 .replace(/^(\d+)\. (.+)$/gm, '<p class="ml-4 mb-1"><strong>$1.</strong> $2</p>')
                                 .replace(/\n\n/g, '</p><p class="text-gray-600 leading-relaxed">')}
-            `;
+            `);
 
             document.getElementById('chatMessages').innerHTML = `
                 <div class="flex items-start gap-3">
@@ -598,19 +638,29 @@
 
             const messagesContainer = document.getElementById('chatMessages');
             
-            // 添加用户消息
+            // 添加用户消息 - 安全渲染
             const userMessage = document.createElement('div');
             userMessage.className = 'flex items-start gap-3 justify-end';
-            userMessage.innerHTML = `
-                <div class="bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl p-3 shadow-sm max-w-[80%]">
-                    <p class="text-sm text-white">${message}</p>
-                </div>
-                <div class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                </div>
+
+            const userBubble = document.createElement('div');
+            userBubble.className = 'bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl p-3 shadow-sm max-w-[80%]';
+
+            const userText = document.createElement('p');
+            userText.className = 'text-sm text-white';
+            userText.textContent = message;
+
+            userBubble.appendChild(userText);
+
+            const userAvatar = document.createElement('div');
+            userAvatar.className = 'w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0';
+            userAvatar.innerHTML = `
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
             `;
+
+            userMessage.appendChild(userBubble);
+            userMessage.appendChild(userAvatar);
             messagesContainer.appendChild(userMessage);
 
             input.value = '';
@@ -636,7 +686,8 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
             // 检查是否有 API Key
-            if (API_KEY === 'YOUR_API_KEY_HERE' || !API_KEY) {
+            const API_KEY = getAPIKey();
+            if (!API_KEY) {
                 botMessage.innerHTML = `
                     <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -644,7 +695,11 @@
                         </svg>
                     </div>
                     <div class="bg-white rounded-xl p-3 shadow-sm">
-                        <p class="text-sm text-red-600">请先在代码顶部的 <code class="bg-gray-100 px-1 rounded">API_KEY</code> 变量中填入您的 API Key！</p>
+                        <p class="text-sm text-red-600">请先设置 API Key！</p>
+                        <div class="mt-2 flex gap-2">
+                            <input type="password" id="apiKeyInput" placeholder="输入 API Key" class="flex-1 px-2 py-1 text-xs border rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <button onclick="saveAPIKey()" class="text-xs px-3 py-1 bg-primary-500 text-white rounded hover:bg-primary-600">保存</button>
+                        </div>
                         <p class="text-xs text-gray-500 mt-1">您可以使用 OpenAI 或 DeepSeek 等兼容 OpenAI 格式的 API。</p>
                     </div>
                 `;
@@ -679,16 +734,18 @@ ${currentArticle.content}
                             </svg>
                         </div>
                         <div class="bg-white rounded-xl p-3 shadow-sm">
-                            <p class="text-sm text-red-600">API 调用失败：${err.message}</p>
+                            <p class="text-sm text-red-600"></p>
                             <p class="text-xs text-gray-500 mt-1">请检查您的 API Key 和网络连接。</p>
                         </div>
                     `;
+                    botMessage.querySelector('.text-red-600').textContent = `API 调用失败：${err.message}`;
                 }
             }
         }
 
         // 流式 API 调用
         async function callStreamingAPI(userMessage, systemPrompt, botMessageElement, container) {
+            const API_KEY = getAPIKey();
             const response = await fetch(`${API_BASE_URL}/chat/completions`, {
                 method: 'POST',
                 headers: {
@@ -742,7 +799,7 @@ ${currentArticle.content}
                             const json = JSON.parse(data);
                             const delta = json.choices?.[0]?.delta?.content || '';
                             fullText += delta;
-                            contentElement.textContent = fullText;
+                            contentElement.textContent = fullText; // 使用 textContent 防止 XSS
                             container.scrollTop = container.scrollHeight;
                         } catch (e) {
                             // 忽略解析错误
@@ -754,6 +811,7 @@ ${currentArticle.content}
 
         // 普通 API 调用（非流式）
         async function callNormalAPI(userMessage, systemPrompt, botMessageElement, container) {
+            const API_KEY = getAPIKey();
             const response = await fetch(`${API_BASE_URL}/chat/completions`, {
                 method: 'POST',
                 headers: {
@@ -784,9 +842,11 @@ ${currentArticle.content}
                     </svg>
                 </div>
                 <div class="bg-white rounded-xl p-3 shadow-sm">
-                    <p class="text-sm text-gray-700">${reply}</p>
+                    <p class="text-sm text-gray-700"></p>
                 </div>
             `;
+            // 使用 textContent 设置回复内容，防止 XSS
+            botMessageElement.querySelector('p').textContent = reply;
             container.scrollTop = container.scrollHeight;
         }
 
