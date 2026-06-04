@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 行业脉搏</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/lucide@2.0.0/dist/lucide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <!-- 开发者配置（请在 config.js 中填入 API Key）-->
+    <script src="config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75',
+                        },
+                        dark: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-right': 'slideRight 0.3s ease-out',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'typing': 'typing 0.8s steps(20) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideRight: {
+                            '0%': { opacity: '0', transform: 'translateX(20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(14, 165, 233, 0.3)' },
+                            '50%': { boxShadow: '0 0 40px rgba(14, 165, 233, 0.6)' },
+                        },
+                        typing: {
+                            '0%': { opacity: '0.4' },
+                            '50%': { opacity: '1' },
+                            '100%': { opacity: '0.4' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #0ea5e9 0%, #d946ef 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gradient-border {
+            position: relative;
+        }
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, #0ea5e9, #d946ef);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(14, 165, 233, 0.5);
+            border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: rgba(14, 165, 233, 0.7);
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+    <script>
+        // ==================== 安全工具函数 ====================
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return str;
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function isValidImageUrl(url) {
+            try {
+                const urlObj = new URL(url);
+                return ['http:', 'https:'].includes(urlObj.protocol);
+            } catch {
+                return false;
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
+    <header class="glass-effect sticky top-0 z-50 border-b border-white/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 via-accent-500 to-primary-400 flex items-center justify-center animate-pulse-glow">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5"></path>
+                            <path d="M2 12l10 5 10-5"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold gradient-text">AI 行业脉搏</h1>
+                        <div class="flex items-center gap-2">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                            </span>
+                            <span class="text-xs text-gray-500">实时追踪 AI 前沿动态</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs px-3 py-1 rounded-full bg-red-50 text-red-600 font-medium flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                            </svg>
+                            热门
+                        </span>
+                        <span class="text-xs px-3 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">LLM</span>
+                        <span class="text-xs px-3 py-1 rounded-full bg-purple-50 text-purple-600 font-medium">RAG</span>
+                        <span class="text-xs px-3 py-1 rounded-full bg-green-50 text-green-600 font-medium">多模态</span>
+                    </div>
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-all hover:scale-105">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                    <div id="userArea" class="flex items-center gap-3">
+                        <div id="quotaDisplay" class="hidden flex items-center gap-2 text-xs text-gray-600">
+                            <span id="aiQuotaBadge" class="px-2 py-1 rounded-full bg-blue-100 text-blue-600">AI: 0/3</span>
+                            <span id="articleQuotaBadge" class="px-2 py-1 rounded-full bg-purple-100 text-purple-600">文章: 0/5</span>
+                        </div>
+                        <button id="loginBtn" class="px-4 py-2 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 text-white text-sm font-medium hover:shadow-lg transition-all">
+                            登录
+                        </button>
+                        <button id="userBtn" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-all">
+                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center">
+                                <span class="text-white text-xs font-medium" id="userInitial">U</span>
+                            </div>
+                            <span class="text-sm text-gray-700" id="userEmail">user@example.com</span>
+                            <div id="vipBadge" class="hidden text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold">
+                                VIP
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 登录弹窗 -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="loginOverlay"></div>
+        <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-gray-800">登录 AI 行业脉搏</h2>
+                <button id="closeLoginModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="loginStep1" class="p-6">
+                <p class="text-gray-600 mb-4">输入邮箱接收验证码</p>
+                <input type="email" id="loginEmail" placeholder="your@email.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none mb-3">
+                <button id="sendCodeBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium hover:shadow-lg transition-all">
+                    发送验证码
+                </button>
+            </div>
+            <div id="loginStep2" class="p-6 hidden">
+                <p class="text-gray-600 mb-4">输入 6 位验证码</p>
+                <input type="text" id="loginCode" placeholder="000000" maxlength="6" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none text-center text-2xl tracking-widest mb-3">
+                <button id="loginBtnConfirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium hover:shadow-lg transition-all">
+                    登录
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 付费墙弹窗 -->
+    <div id="paywallModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="paywallOverlay"></div>
+        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">解锁无限 VIP 功能</h2>
+                    <p class="text-sm text-gray-500" id="paywallMessage">今日次数已用完</p>
+                </div>
+                <button id="closePaywallModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div id="monthlyPlan" class="p-4 rounded-xl border-2 border-primary-200 bg-gradient-to-br from-blue-50 to-purple-50 cursor-pointer plan-card">
+                        <h3 class="font-bold text-gray-800">包月</h3>
+                        <p class="text-3xl font-bold mt-2 text-gray-800">¥19.9</p>
+                        <p class="text-sm text-gray-500 mt-1">30 天 VIP</p>
+                    </div>
+                    <div id="yearlyPlan" class="p-4 rounded-xl border-2 border-primary-200 bg-gradient-to-br from-purple-50 to-pink-50 cursor-pointer plan-card">
+                        <h3 class="font-bold text-gray-800">包年</h3>
+                        <p class="text-3xl font-bold mt-2 text-gray-800">¥199.9</p>
+                        <p class="text-sm text-gray-500 mt-1">365 天 VIP</p>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 text-center">
+                    <p class="text-gray-700 mb-4">
+                        扫码支付后，请联系管理员手动开通 VIP
+                    </p>
+                    <div class="w-64 h-64 mx-auto bg-white rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-400">
+                        <span class="text-sm">赞赏码占位</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">
+                        支付后请在下方填入您的邮箱，或联系管理员：admin@example.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员后台 -->
+    <div id="adminModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="adminOverlay"></div>
+        <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-gray-800">VIP 管理后台</h2>
+                <button id="closeAdminModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-2">用户邮箱</label>
+                        <input type="email" id="adminEmail" placeholder="user@email.com" class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-primary-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-2">时长</label>
+                        <select id="adminDuration" class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-primary-500 outline-none">
+                            <option value="30">30 天</option>
+                            <option value="365">365 天</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button id="searchUserBtn" class="flex-1 px-4 py-2 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-all">
+                        查询状态
+                    </button>
+                    <button id="grantVIPBtn" class="flex-1 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium hover:shadow-lg transition-all">
+                        授予 VIP
+                    </button>
+                    <button id="revokeVIPBtn" class="px-4 py-2 rounded-xl border border-red-300 text-red-700 font-medium hover:bg-red-50 transition-all">
+                        取消 VIP
+                    </button>
+                </div>
+                <div id="adminResult" class="mt-4 text-sm text-gray-700 hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-1">
+                <div class="glass-effect rounded-2xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                            </div>
+                            <h2 class="text-lg font-semibold text-gray-800">资讯库</h2>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-600">8 篇</span>
+                    </div>
+                    <div class="space-y-3" id="newsList">
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="glass-effect rounded-2xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                            </div>
+                            <h2 class="text-lg font-semibold text-gray-800">核心概念库</h2>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="filter-tag tag-active px-3 py-1.5 rounded-full text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-accent-500">全部</button>
+                            <button class="filter-tag px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">热门</button>
+                            <button class="filter-tag px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">推荐</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="conceptCards">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="articleModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="modalOverlay"></div>
+        <div class="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between p-6 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-600" id="modalCategory"></span>
+                    <span class="text-sm text-gray-500" id="modalSource"></span>
+                </div>
+                <button id="closeModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-hidden flex">
+                <div class="flex-1 overflow-y-auto p-6 scrollbar-thin" id="articleContent">
+                </div>
+                <div id="aiDrawer" class="w-96 border-l border-gray-100 flex flex-col bg-gray-50">
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-800">AI 智能讨论</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">针对文章内容进行智能问答</p>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin" id="chatMessages">
+                        <div class="flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                            </div>
+                            <div class="bg-white rounded-xl p-3 shadow-sm">
+                                <p class="text-sm text-gray-700">您好！我是您的 AI 助手。请在代码顶部填写您的 API Key，然后就可以针对这篇文章进行智能问答了！</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="text" 
+                                id="chatInput"
+                                placeholder="输入您的问题..." 
+                                class="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                            >
+                            <button id="sendMessage" class="p-2.5 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-xl hover:opacity-90 transition-opacity hover:scale-105">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== API 配置（从 config.js 读取）================
+        function getAPIKey() {
+            return window.AI_PULSE_CONFIG?.apiKey || '';
+        }
+
+        function getAPIConfig() {
+            return {
+                apiKey: window.AI_PULSE_CONFIG?.apiKey || '',
+                apiBaseUrl: window.AI_PULSE_CONFIG?.apiBaseUrl || 'https://api.openai.com/v1',
+                model: window.AI_PULSE_CONFIG?.model || 'gpt-4o'
+            };
+        }
+
+        function isAPIConfigured() {
+            const config = getAPIConfig();
+            return config.apiKey && config.apiKey !== 'YOUR_API_KEY_HERE';
+        }
+
+        function saveAPIKey() {
+            const input = document.getElementById('apiKeyInput');
+            if (input && input.value.trim()) {
+                if (!window.AI_PULSE_CONFIG) window.AI_PULSE_CONFIG = {};
+                window.AI_PULSE_CONFIG.apiKey = input.value.trim();
+                alert('API Key 已临时保存！（刷新页面后需重新设置）');
+            }
+        }
+
+        const AI_CONFIG = getAPIConfig();
+        const API_BASE_URL = AI_CONFIG.apiBaseUrl;
+        const API_MODEL = AI_CONFIG.model;
+        
+        let currentArticle = null; // 当前打开的文章对象
+
+        // ==================== 模拟数据 ====================
+        const mockArticles = [
+            {
+                id: 1,
+                title: 'OpenAI 发布 GPT-5 预览版，性能提升 300%',
+                source: 'TechCrunch',
+                date: '2小时前',
+                category: '大语言模型',
+                image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=AI%20neural%20network%20technology%20abstract%20blue%20gradient&image_size=landscape_16_9',
+                summary: 'OpenAI 正式发布了 GPT-5 的技术预览版，据官方数据显示，其性能相比上一代提升了 300%。',
+                content: '## GPT-5 技术预览版发布\n\nOpenAI 今日正式发布了 GPT-5 的技术预览版，这是继 GPT-4 之后的又一次重大升级。\n\n### 核心性能提升\n\n根据官方公布的数据，GPT-5 在多个基准测试中表现出色：\n\n- **推理能力提升 300%** - 在复杂逻辑推理任务中展现出惊人的进步\n- **上下文理解** - 支持 100 万 token 的上下文窗口\n- **多模态能力** - 新增视频理解和生成功能\n\n### 技术亮点\n\n1. **自适应计算** - 根据任务复杂度动态分配计算资源\n2. **实时学习** - 能够在对话过程中快速学习新知识\n3. **安全性增强** - 内置多层安全防护机制\n\n### 应用场景\n\nGPT-5 预计将在以下领域发挥重要作用：\n- 代码生成和调试\n- 科学研究辅助\n- 创意内容生成\n- 教育辅导\n\n### 发布计划\n\nOpenAI 表示，GPT-5 将于明年第一季度面向企业客户开放 API 访问，个人用户预计在第二季度可以体验。\n\n---\n\n**来源**: TechCrunch | **发布时间**: 2小时前',
+                hot: true
+            },
+            {
+                id: 2,
+                title: '谷歌推出新一代 Gemini 模型，支持多模态理解',
+                source: 'The Verge',
+                date: '5小时前',
+                category: '多模态',
+                image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=colorful%20AI%20brain%20with%20multiple%20sensory%20inputs&image_size=landscape_16_9',
+                summary: '谷歌发布了新一代 Gemini 模型，具备强大的多模态理解能力，可同时处理文本、图像、音频和视频。',
+                content: '## 谷歌 Gemini：新一代多模态 AI 模型\n\n谷歌今日推出了其最新的 AI 模型 Gemini，标志着多模态 AI 发展的重要里程碑。\n\n### 多模态能力突破\n\nGemini 支持以下模态的理解和生成：\n\n- **文本** - 支持 30+ 种语言的理解和生成\n- **图像** - 高精度图像识别和描述\n- **音频** - 语音识别、合成和情感分析\n- **视频** - 完整视频内容理解和摘要\n\n### 技术架构\n\nGemini 采用了全新的 Mixture of Experts (MoE) 架构：\n\n- 由 16 个专家模型组成\n- 根据输入动态选择相关专家\n- 兼顾效率和性能\n\n### 实际应用\n\n谷歌计划将 Gemini 整合到多个产品中：\n- Google Search 的高级理解能力\n- YouTube 的视频内容分析\n- Google Workspace 的智能助手\n\n---\n\n**来源**: The Verge | **发布时间**: 5小时前',
+                hot: true
+            },
+            {
+                id: 3,
+                title: 'RAG 技术成为企业 AI 部署新热点',
+                source: 'AI Trends',
+                date: '昨天',
+                category: '检索增强生成',
+                summary: '检索增强生成 (RAG) 技术正在成为企业部署 AI 解决方案的首选架构，有效解决了大模型的幻觉问题。',
+                content: '## RAG：企业 AI 部署的新范式\n\n检索增强生成 (Retrieval-Augmented Generation) 技术正在企业 AI 领域掀起热潮。\n\n### 什么是 RAG\n\nRAG 是一种将信息检索与生成模型相结合的技术架构：\n\n1. **检索阶段** - 从知识库中检索相关信息\n2. **生成阶段** - 基于检索结果生成回答\n3. **优势** - 提高准确性，减少幻觉\n\n### 企业采用情况\n\n根据最新调查，超过 60% 的企业在部署 AI 时采用了 RAG 架构：\n\n- 金融行业：合规文档查询\n- 医疗行业：病历分析和诊断辅助\n- 法律行业：合同审查和法律研究\n\n### 技术优势\n\n- **准确性** - 回答基于真实数据\n- **可追溯性** - 可追踪回答来源\n- **时效性** - 支持实时数据更新\n- **成本效益** - 降低大模型调用成本\n\n---\n\n**来源**: AI Trends | **发布时间**: 昨天',
+                hot: false
+            },
+            {
+                id: 4,
+                title: 'MoE 架构：大模型效率革命',
+                source: 'MIT Tech Review',
+                date: '昨天',
+                category: '深度学习',
+                summary: 'Mixture of Experts (MoE) 架构正在改变大模型的训练和推理方式，大幅提升效率的同时保持高性能。',
+                content: '## MoE 架构：AI 效率的突破\n\nMixture of Experts (MoE) 架构正在引领大模型效率革命。\n\n### MoE 原理\n\nMoE 将模型拆分为多个\"专家\"模块：\n\n- 每个专家专注于特定领域\n- 门控网络决定调用哪些专家\n- 只激活相关专家进行计算\n\n### 效率提升\n\n相比传统 Transformer：\n- **训练效率提升 3-5 倍**\n- **推理成本降低 50%**\n- **模型容量可扩展性更高**\n\n### 代表性模型\n\n- GPT-4：采用 MoE 变体\n- Gemini：16 专家架构\n- Mixtral：8 专家开源模型\n\n### 未来展望\n\nMoE 架构预计将成为下一代大模型的标准设计范式，平衡性能与效率。\n\n---\n\n**来源**: MIT Tech Review | **发布时间**: 昨天',
+                hot: true
+            }
+        ];
+
+        const mockConcepts = [
+            {
+                id: 1,
+                title: 'RAG (检索增强生成)',
+                category: '检索增强生成',
+                definition: 'RAG 是一种将信息检索与生成模型相结合的技术，通过从外部知识库检索相关信息来增强生成模型的输出准确性，有效解决大模型的幻觉问题。',
+                hot: true,
+                recommended: true,
+                icon: 'search',
+                tags: ['检索', '知识库', 'LLM'],
+                views: 15230,
+                likes: 412,
+                saved: false
+            },
+            {
+                id: 2,
+                title: 'MoE (混合专家模型)',
+                category: '深度学习',
+                definition: 'MoE 是一种深度学习架构，将模型拆分为多个专家模块，通过门控网络动态选择相关专家进行计算，在提升模型容量的同时保持高效推理。',
+                hot: true,
+                recommended: true,
+                icon: 'git-merge',
+                tags: ['专家系统', '效率', '扩展'],
+                views: 12890,
+                likes: 356,
+                saved: false
+            },
+            {
+                id: 3,
+                title: '大语言模型 (LLM)',
+                category: '大语言模型',
+                definition: '大语言模型是基于深度学习的人工智能系统，通过学习海量文本数据掌握语言模式，能够完成对话、写作、翻译等多种自然语言处理任务。',
+                hot: true,
+                recommended: true,
+                icon: 'brain',
+                tags: ['GPT', 'Transformer', 'NLP'],
+                views: 18560,
+                likes: 523,
+                saved: false
+            },
+            {
+                id: 4,
+                title: '多模态 AI',
+                category: '多模态',
+                definition: '多模态 AI 能够处理和理解多种类型数据，包括文本、图像、音频、视频等，整合不同模态信息提供更全面的理解和交互体验。',
+                hot: true,
+                recommended: false,
+                icon: 'layers',
+                tags: ['跨模态', '融合', '理解'],
+                views: 9870,
+                likes: 289,
+                saved: false
+            },
+            {
+                id: 5,
+                title: 'AI 代理',
+                category: 'AI 代理',
+                definition: 'AI 代理是具备自主能力的智能系统，能够独立规划任务、调用工具、反思结果，自动完成复杂的多步骤任务。',
+                hot: true,
+                recommended: true,
+                icon: 'bot',
+                tags: ['自主', '规划', '工具'],
+                views: 8760,
+                likes: 245,
+                saved: false
+            },
+            {
+                id: 6,
+                title: '扩散模型',
+                category: '生成模型',
+                definition: '扩散模型是一种生成模型，通过逐步添加噪声再去除噪声的过程生成数据，在图像生成领域取得了突破性成果。',
+                hot: false,
+                recommended: false,
+                icon: 'wind',
+                tags: ['Stable Diffusion', '图像生成', 'DALL-E'],
+                views: 7650,
+                likes: 198,
+                saved: false
+            }
+        ];
+
+        const iconMap = {
+            'brain': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>',
+            'search': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>',
+            'git-merge': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>',
+            'layers': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>',
+            'bot': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"></path></svg>',
+            'wind': '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>'
+        };
+
+        function formatNumber(num) {
+            if (num >= 10000) {
+                return (num / 10000).toFixed(1) + 'w';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num;
+        }
+
+        function renderNewsList(articles) {
+            const container = document.getElementById('newsList');
+            container.innerHTML = '';
+
+            articles.forEach((article, index) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-all card-hover article-item';
+                item.style.animation = `slideUp 0.3s ease-out ${index * 0.05}s both`;
+                item.dataset.id = article.id;
+
+                const safeImageUrl = isValidImageUrl(article.image) ? article.image : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2248%22 viewBox=%220 0 64 48%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2264%22 height=%2248%22/%3E%3C/svg%3E';
+
+                item.innerHTML = DOMPurify.sanitize(`
+                    <div class="w-16 h-12 flex-shrink-0 rounded-lg overflow-hidden">
+                        <img src="${safeImageUrl}" alt="${escapeHTML(article.title)}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            ${article.hot ? '<span class="text-xs px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 flex items-center gap-0.5"><svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span>' : ''}
+                            <span class="text-xs text-gray-400">${escapeHTML(article.date)}</span>
+                        </div>
+                        <h3 class="text-sm font-medium text-gray-800 line-clamp-2">${escapeHTML(article.title)}</h3>
+                        <p class="text-xs text-gray-500 mt-1">${escapeHTML(article.source)}</p>
+                    </div>
+                `);
+
+                container.appendChild(item);
+            });
+        }
+
+        function renderConcepts(concepts, filter = '全部') {
+            const container = document.getElementById('conceptCards');
+            container.innerHTML = '';
+
+            let filtered = concepts;
+            if (filter === '热门') {
+                filtered = concepts.filter(c => c.hot);
+            } else if (filter === '推荐') {
+                filtered = concepts.filter(c => c.recommended);
+            }
+
+            filtered.forEach((concept, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl p-5 shadow-sm card-hover border border-gray-100';
+                card.style.animation = `slideUp 0.4s ease-out ${index * 0.08}s both`;
+
+                card.innerHTML = DOMPurify.sanitize(`
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-50 to-accent-50 flex items-center justify-center text-primary-600">
+                                ${iconMap[concept.icon] || ''}
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${escapeHTML(concept.title)}</h3>
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${escapeHTML(concept.category)}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            ${concept.hot ? '<span class="text-xs px-1.5 py-0.5 rounded-full bg-red-100 text-red-600">热门</span>' : ''}
+                            ${concept.recommended ? '<span class="text-xs px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600">推荐</span>' : ''}
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 line-clamp-2 mb-3">${escapeHTML(concept.definition)}</p>
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                        ${concept.tags.map(tag => `<span class="text-xs px-2 py-0.5 rounded-full bg-primary-50 text-primary-600">${escapeHTML(tag)}</span>`).join('')}
+                    </div>
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                ${formatNumber(concept.views)}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                ${concept.likes}
+                            </span>
+                        </div>
+                        <button class="save-concept-btn p-1.5 rounded-lg hover:bg-yellow-50 transition-colors" data-id="${concept.id}">
+                            <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `);
+
+                container.appendChild(card);
+            });
+        }
+
+        function openArticleModal(articleId) {
+            const article = mockArticles.find(a => a.id === articleId);
+            if (!article) return;
+
+            currentArticle = article; // 保存当前文章
+
+            document.getElementById('modalCategory').textContent = article.category;
+            document.getElementById('modalSource').textContent = `${article.source} · ${article.date}`;
+
+            const safeImageUrl = isValidImageUrl(article.image) ? article.image : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%25%22 height=%22256%22 viewBox=%220 0 100 256%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22100%22 height=%22256%22/%3E%3C/svg%3E';
+
+            document.getElementById('articleContent').innerHTML = DOMPurify.sanitize(`
+                <h1 class="text-2xl font-bold text-gray-800 mb-4">${escapeHTML(article.title)}</h1>
+                <img src="${safeImageUrl}" alt="${escapeHTML(article.title)}" class="w-full h-64 object-cover rounded-xl mb-6">
+                ${escapeHTML(article.content).replace(/## (.+)/g, '<h2 class="text-xl font-semibold text-gray-800 mt-6 mb-3">$1</h2>')
+                                .replace(/### (.+)/g, '<h3 class="text-lg font-semibold text-gray-700 mt-4 mb-2">$1</h3>')
+                                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                                .replace(/\|(.+)\|/g, '<div class="bg-gray-50 rounded-lg p-4 mb-4">$1</div>')
+                                .replace(/^- (.+)$/gm, '<li class="ml-4 mb-1">$1</li>')
+                                .replace(/^(\d+)\. (.+)$/gm, '<p class="ml-4 mb-1"><strong>$1.</strong> $2</p>')
+                                .replace(/\n\n/g, '</p><p class="text-gray-600 leading-relaxed">')}
+            `);
+
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="bg-white rounded-xl p-3 shadow-sm">
+                        <p class="text-sm text-gray-700">您好！我是您的 AI 助手。请在代码顶部填写您的 API Key，然后就可以针对这篇文章进行智能问答了！</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('articleModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('articleModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // 完全重写 sendMessage 函数
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // 添加用户消息 - 安全渲染
+            const userMessage = document.createElement('div');
+            userMessage.className = 'flex items-start gap-3 justify-end';
+
+            const userBubble = document.createElement('div');
+            userBubble.className = 'bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl p-3 shadow-sm max-w-[80%]';
+
+            const userText = document.createElement('p');
+            userText.className = 'text-sm text-white';
+            userText.textContent = message;
+
+            userBubble.appendChild(userText);
+
+            const userAvatar = document.createElement('div');
+            userAvatar.className = 'w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0';
+            userAvatar.innerHTML = `
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+            `;
+
+            userMessage.appendChild(userBubble);
+            userMessage.appendChild(userAvatar);
+            messagesContainer.appendChild(userMessage);
+
+            input.value = '';
+
+            // 创建机器人回复消息容器
+            const botMessage = document.createElement('div');
+            botMessage.className = 'flex items-start gap-3 mt-3';
+            botMessage.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-white animate-typing" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div class="bg-white rounded-xl p-3 shadow-sm">
+                    <div class="flex gap-1">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(botMessage);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // 检查是否已配置 API Key（开发者统一配置）
+            if (!isAPIConfigured()) {
+                botMessage.innerHTML = `
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="bg-white rounded-xl p-3 shadow-sm">
+                        <p class="text-sm text-red-600">AI 功能未配置！</p>
+                        <p class="text-xs text-gray-500 mt-1">请联系网站开发者配置 API Key 后使用 AI 智能讨论功能。</p>
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                return;
+            }
+
+            // 准备请求数据
+            const systemPrompt = `你是一位专业的 AI 助手，请基于以下文章内容回答用户的问题：
+
+文章标题：${currentArticle.title}
+文章来源：${currentArticle.source}
+文章分类：${currentArticle.category}
+
+文章内容：
+${currentArticle.content}
+
+请用简洁、专业的语言回答用户的问题。如果文章中没有相关信息，请明确告知用户。`;
+
+            try {
+                // 尝试流式传输
+                await callStreamingAPI(message, systemPrompt, botMessage, messagesContainer);
+            } catch (error) {
+                // 如果流式传输失败，尝试普通调用
+                try {
+                    await callNormalAPI(message, systemPrompt, botMessage, messagesContainer);
+                } catch (err) {
+                    botMessage.innerHTML = `
+                        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                        </div>
+                        <div class="bg-white rounded-xl p-3 shadow-sm">
+                            <p class="text-sm text-red-600"></p>
+                            <p class="text-xs text-gray-500 mt-1">请检查您的 API Key 和网络连接。</p>
+                        </div>
+                    `;
+                    botMessage.querySelector('.text-red-600').textContent = `API 调用失败：${err.message}`;
+                }
+            }
+        }
+
+        // 流式 API 调用
+        async function callStreamingAPI(userMessage, systemPrompt, botMessageElement, container) {
+            const API_KEY = getAPIKey();
+            const response = await fetch(`${API_BASE_URL}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: API_MODEL,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userMessage }
+                    ],
+                    stream: true
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || response.statusText);
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            botMessageElement.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div class="bg-white rounded-xl p-3 shadow-sm">
+                    <p class="text-sm text-gray-700" id="streaming-content"></p>
+                </div>
+            `;
+            const contentElement = document.getElementById('streaming-content');
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') break;
+
+                        try {
+                            const json = JSON.parse(data);
+                            const delta = json.choices?.[0]?.delta?.content || '';
+                            fullText += delta;
+                            contentElement.textContent = fullText; // 使用 textContent 防止 XSS
+                            container.scrollTop = container.scrollHeight;
+                        } catch (e) {
+                            // 忽略解析错误
+                        }
+                    }
+                }
+            }
+        }
+
+        // 普通 API 调用（非流式）
+        async function callNormalAPI(userMessage, systemPrompt, botMessageElement, container) {
+            const API_KEY = getAPIKey();
+            const response = await fetch(`${API_BASE_URL}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: API_MODEL,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userMessage }
+                    ]
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || response.statusText);
+            }
+
+            const data = await response.json();
+            const reply = data.choices?.[0]?.message?.content || '抱歉，没有收到回复。';
+
+            botMessageElement.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div class="bg-white rounded-xl p-3 shadow-sm">
+                    <p class="text-sm text-gray-700"></p>
+                </div>
+            `;
+            // 使用 textContent 设置回复内容，防止 XSS
+            botMessageElement.querySelector('p').textContent = reply;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNewsList(mockArticles);
+            renderConcepts(mockConcepts);
+
+            document.addEventListener('click', (e) => {
+                const articleItem = e.target.closest('.article-item');
+                if (articleItem) {
+                    const id = parseInt(articleItem.dataset.id);
+                    openArticleModal(id);
+                }
+
+                if (e.target.closest('#closeModal') || e.target.closest('#modalOverlay')) {
+                    closeModal();
+                }
+
+                const saveBtn = e.target.closest('.save-concept-btn');
+                if (saveBtn) {
+                    const id = parseInt(saveBtn.dataset.id);
+                    const concept = mockConcepts.find(c => c.id === id);
+                    if (concept) {
+                        concept.saved = !concept.saved;
+                        const icon = saveBtn.querySelector('svg');
+                        if (concept.saved) {
+                            icon.classList.add('text-yellow-500', 'fill-yellow-500');
+                        } else {
+                            icon.classList.remove('text-yellow-500', 'fill-yellow-500');
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('sendMessage').addEventListener('click', sendMessage);
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            const filterTags = document.querySelectorAll('.filter-tag');
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    filterTags.forEach(t => {
+                        t.classList.remove('tag-active', 'text-white', 'bg-gradient-to-r', 'from-primary-500', 'to-accent-500');
+                        t.classList.add('bg-gray-100', 'text-gray-600');
+                    });
+                    tag.classList.remove('bg-gray-100', 'text-gray-600');
+                    tag.classList.add('tag-active', 'text-white', 'bg-gradient-to-r', 'from-primary-500', 'to-accent-500');
+                    
+                    renderConcepts(mockConcepts, tag.textContent);
+                });
+            });
+
+            // ========================================
+            // 用户认证与付费墙
+            // ========================================
+            
+            // 动态检测 API 地址：优先使用配置，否则根据当前域名推断
+            const getAPIBase = () => {
+                if (typeof window.API_CONFIG !== 'undefined' && window.API_CONFIG.API_BASE_URL) {
+                    return window.API_CONFIG.API_BASE_URL;
+                }
+                // 如果是本地开发，使用 localhost
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    return 'http://localhost:8000';
+                }
+                // 在 Trae 预览等环境中，尝试使用当前域名替换端口
+                const protocol = window.location.protocol;
+                const hostname = window.location.hostname;
+                // 尝试多个常见后端端口
+                const possiblePorts = [8000, 3001, 5000];
+                // 默认返回相对路径（让浏览器处理）
+                return '';
+            };
+            const API_BASE = getAPIBase();
+            let currentUser = null;
+            let currentQuota = null;
+
+            // 显示/隐藏登录状态
+            function updateAuthUI() {
+                const loginBtn = document.getElementById('loginBtn');
+                const userBtn = document.getElementById('userBtn');
+                const quotaDisplay = document.getElementById('quotaDisplay');
+                const vipBadge = document.getElementById('vipBadge');
+
+                if (currentUser) {
+                    loginBtn.classList.add('hidden');
+                    userBtn.classList.remove('hidden');
+                    document.getElementById('userEmail').textContent = currentUser.email;
+                    document.getElementById('userInitial').textContent = currentUser.email[0].toUpperCase();
+
+                    if (currentQuota) {
+                        quotaDisplay.classList.remove('hidden');
+                        if (currentQuota.is_vip) {
+                            document.getElementById('aiQuotaBadge').textContent = 'AI: ∞';
+                            document.getElementById('articleQuotaBadge').textContent = '文章: ∞';
+                            vipBadge.classList.remove('hidden');
+                        } else {
+                            document.getElementById('aiQuotaBadge').textContent = `AI: ${currentQuota.ai_used}/${currentQuota.ai_limit}`;
+                            document.getElementById('articleQuotaBadge').textContent = `文章: ${currentQuota.article_used}/${currentQuota.article_limit}`;
+                            vipBadge.classList.add('hidden');
+                        }
+                    }
+                } else {
+                    loginBtn.classList.remove('hidden');
+                    userBtn.classList.add('hidden');
+                    quotaDisplay.classList.add('hidden');
+                }
+            }
+
+            // 获取配额
+            async function fetchQuota() {
+                if (!localStorage.getItem('authToken')) return;
+                try {
+                    const response = await fetch(`${API_BASE}/api/usage/quota`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+                    if (response.ok) {
+                        currentQuota = await response.json();
+                        updateAuthUI();
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch quota:', e);
+                }
+            }
+
+            // 检查使用配额
+            async function checkUsage(type) {
+                if (!localStorage.getItem('authToken')) {
+                    openLoginModal();
+                    return false;
+                }
+                try {
+                    const response = await fetch(`${API_BASE}/api/usage/check`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({ type })
+                    });
+                    const data = await response.json();
+                    if (data.allowed) {
+                        fetchQuota();
+                        return true;
+                    } else {
+                        document.getElementById('paywallMessage').textContent = data.message || '今日次数已用完';
+                        openPaywallModal();
+                        return false;
+                    }
+                } catch (e) {
+                    console.error('Failed to check usage:', e);
+                    return false;
+                }
+            }
+
+            // 包装发送消息，检查配额
+            const originalSendMessage = sendMessage;
+            sendMessage = async function() {
+                const allowed = await checkUsage('ai');
+                if (allowed) {
+                    originalSendMessage.apply(this, arguments);
+                }
+            };
+
+            // 包装打开文章，检查配额
+            const originalOpenArticleModal = openArticleModal;
+            openArticleModal = async function(id) {
+                const allowed = await checkUsage('article');
+                if (allowed) {
+                    originalOpenArticleModal.apply(this, arguments);
+                }
+            };
+
+            // 登录弹窗
+            document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+            document.getElementById('closeLoginModal').addEventListener('click', closeLoginModal);
+            document.getElementById('loginOverlay').addEventListener('click', closeLoginModal);
+
+            function openLoginModal() {
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('loginStep1').classList.remove('hidden');
+                document.getElementById('loginStep2').classList.add('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeLoginModal() {
+                document.getElementById('loginModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            // 发送验证码
+            document.getElementById('sendCodeBtn').addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                if (!email) return;
+                try {
+                    const response = await fetch(`${API_BASE}/api/auth/send-code`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    if (response.ok) {
+                        document.getElementById('loginStep1').classList.add('hidden');
+                        document.getElementById('loginStep2').classList.remove('hidden');
+                    }
+                } catch (e) {
+                    console.error('Failed to send code:', e);
+                }
+            });
+
+            // 登录
+            document.getElementById('loginBtnConfirm').addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                const code = document.getElementById('loginCode').value;
+                try {
+                    const response = await fetch(`${API_BASE}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, code })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        localStorage.setItem('authToken', data.access_token);
+                        currentUser = data.user;
+                        closeLoginModal();
+                        updateAuthUI();
+                        fetchQuota();
+                    }
+                } catch (e) {
+                    console.error('Login failed:', e);
+                }
+            });
+
+            // 付费墙弹窗
+            document.getElementById('closePaywallModal').addEventListener('click', () => {
+                document.getElementById('paywallModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            document.getElementById('paywallOverlay').addEventListener('click', () => {
+                document.getElementById('paywallModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            function openPaywallModal() {
+                document.getElementById('paywallModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // 管理员后台 (快速打开方式，生产环境应加权限验证)
+            let adminOpenCount = 0;
+            document.getElementById('userBtn').addEventListener('click', () => {
+                adminOpenCount++;
+                if (adminOpenCount >= 5) {
+                    adminOpenCount = 0;
+                    openAdminModal();
+                }
+            });
+            document.getElementById('closeAdminModal').addEventListener('click', () => {
+                document.getElementById('adminModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            document.getElementById('adminOverlay').addEventListener('click', () => {
+                document.getElementById('adminModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            function openAdminModal() {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // 管理员操作
+            document.getElementById('searchUserBtn').addEventListener('click', async () => {
+                const email = document.getElementById('adminEmail').value;
+                try {
+                    const response = await fetch(`${API_BASE}/api/admin/vip/search?email=${encodeURIComponent(email)}`);
+                    const data = await response.json();
+                    document.getElementById('adminResult').innerHTML = `
+                        用户: ${data.email}<br>
+                        VIP: ${data.is_vip ? '是' : '否'}<br>
+                        到期: ${data.vip_expire_at || '无'}
+                    `;
+                    document.getElementById('adminResult').classList.remove('hidden');
+                } catch (e) {
+                    document.getElementById('adminResult').textContent = '查询失败';
+                    document.getElementById('adminResult').classList.remove('hidden');
+                }
+            });
+            document.getElementById('grantVIPBtn').addEventListener('click', async () => {
+                const email = document.getElementById('adminEmail').value;
+                const duration = parseInt(document.getElementById('adminDuration').value);
+                try {
+                    const response = await fetch(`${API_BASE}/api/admin/vip/grant`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, duration_days: duration })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('adminResult').textContent = 'VIP 授予成功!';
+                        document.getElementById('adminResult').classList.remove('hidden');
+                    }
+                } catch (e) {
+                    document.getElementById('adminResult').textContent = '操作失败';
+                    document.getElementById('adminResult').classList.remove('hidden');
+                }
+            });
+            document.getElementById('revokeVIPBtn').addEventListener('click', async () => {
+                const email = document.getElementById('adminEmail').value;
+                try {
+                    const response = await fetch(`${API_BASE}/api/admin/vip/revoke?email=${encodeURIComponent(email)}`, {
+                        method: 'POST'
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('adminResult').textContent = 'VIP 已取消';
+                        document.getElementById('adminResult').classList.remove('hidden');
+                    }
+                } catch (e) {
+                    document.getElementById('adminResult').textContent = '操作失败';
+                    document.getElementById('adminResult').classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

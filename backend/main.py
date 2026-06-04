@@ -19,6 +19,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select, func, and_, delete
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -237,12 +239,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 静态文件服务
+import os
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# ============================================
+# 前端路由（用于部署）
+# ============================================
+
+@app.get("/")
+async def serve_index():
+    """提供首页"""
+    return FileResponse("static/index.html")
+
+@app.get("/admin")
+async def serve_admin():
+    """提供管理后台"""
+    return FileResponse("static/admin.html")
+
+@app.get("/admin.html")
+async def serve_admin_html():
+    """提供管理后台（兼容旧路径）"""
+    return FileResponse("static/admin.html")
+
+@app.get("/config.js")
+async def serve_config():
+    """提供配置文件"""
+    return FileResponse("static/config.js")
+
 
 # ============================================
 # API 路由
 # ============================================
 
-@app.get("/")
+@app.get("/api")
 async def root():
     """API 根路径"""
     return {
