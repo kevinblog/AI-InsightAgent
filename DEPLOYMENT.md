@@ -21,7 +21,27 @@ backend/
 
 ## 免费部署方案
 
-### 方案一：Render（推荐）
+### 方案一：Vercel（前端静态文件部署）
+**优点**：CDN 加速、部署速度快、完美支持前端静态文件
+
+**注意**：Vercel 对 Python 后端的支持有限（主要适合 Serverless Functions），所以我们推荐以下方案：
+
+**选项 A：只部署前端静态文件**
+1. 注册 Vercel 账户：https://vercel.com/
+2. 安装 Vercel CLI：`npm i -g vercel`
+3. 在项目根目录创建一个 `public/` 文件夹
+4. 将 `index.html`、`admin.html` 和 `config.example.js` 复制到 `public/` 目录
+5. 运行 `vercel` 命令开始部署
+6. 按照提示完成部署
+
+**选项 B：前后端分离部署**
+- 前端：部署在 Vercel（静态文件）
+- 后端：部署在 Render/Fly.io（如其他方案所述）
+- 修改前端 `config.js` 中的 API 地址为后端服务地址
+
+---
+
+### 方案二：Render（全栈推荐）
 **优点**：简单易用，支持 Python 直接部署，免费额度充足
 
 **步骤**：
@@ -36,7 +56,7 @@ backend/
    - `JWT_SECRET_KEY`: 生成一个随机密钥
 6. 部署完成后会得到一个公开 URL
 
-### 方案二：Fly.io
+### 方案三：Fly.io
 **优点**：全球边缘部署，性能好
 
 **步骤**：
@@ -45,7 +65,7 @@ backend/
 3. 部署: `fly launch`
 4. 设置环境变量: `fly secrets set USE_SQLITE=true`
 
-### 方案三：Replit
+### 方案四：Replit
 **优点**：在线开发环境，一键部署
 
 **步骤**：
