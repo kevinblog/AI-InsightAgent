@@ -100,7 +100,7 @@ async def seed_data():
     async with async_session_maker() as session:
         # 检查是否已有数据
         result = await session.execute(select(Article))
-        if result.scalar_one_or_none():
+        if result.scalars().first():
             print("📦 种子数据已存在，跳过...")
             return
 
